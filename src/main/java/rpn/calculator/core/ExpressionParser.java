@@ -2,7 +2,12 @@ package rpn.calculator.core;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ExpressionParser {
+	private static Logger LOG = LogManager.getLogger();
+	
 	// Test if token is an operator
 	private static boolean isOperator(String token) {
 		return Operator.lookup(token) != null;
@@ -13,7 +18,9 @@ public class ExpressionParser {
 		Operator op = Operator.lookup(token);
 		
 		if (op == null) {
-			throw new IllegalArgumentException("Invalid token: " + token);
+			String errorMsg = "Invalid token: " + token;
+			LOG.error(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
 		}
 
 		if (op.getAssociativity() == type) {
@@ -29,7 +36,9 @@ public class ExpressionParser {
 		Operator op2 = Operator.lookup(token2);
 		
 		if (op1 == null || op2 == null) {
-			throw new IllegalArgumentException("Invalid tokens: " + token1 + " " + token2);
+			String errorMsg = "Invalid tokens: " + token1 + " " + token2;
+			LOG.error(errorMsg);
+			throw new IllegalArgumentException(errorMsg);
 		}
 
 		return op1.getPrecedence() - op2.getPrecedence();
@@ -58,7 +67,7 @@ public class ExpressionParser {
 			}
 			// If token is a left bracket '('
 			else if (token.equals(Token.OPEN_PAREN)) {
-				stack.push(token); //
+				stack.push(token);
 			}
 			// If token is a right bracket ')'
 			else if (token.equals(Token.CLOSED_PAREN)) {
@@ -80,7 +89,7 @@ public class ExpressionParser {
 		return out.toArray(new String[out.size()]);
 	}
 
-	public static double RPNtoDouble(String[] tokens) {
+	public static double RPNtoDouble(String[] tokens, double x, double y) {
 		Stack<String> stack = new Stack<String>();
 
 		// For each token
@@ -90,9 +99,10 @@ public class ExpressionParser {
 				stack.push(token);
 			} else {
 				// Token is an operator: pop top two entries
+				Double d2 = getDouble(stack.pop(), x, y);
+				Double d1 = getDouble(stack.pop(), x, y);
+				
 				Operator op = Operator.lookup(token);
-				Double d2 = Double.valueOf(stack.pop());
-				Double d1 = Double.valueOf(stack.pop());
 				Double result = op.getEvaluator().evaluate(d1, d2);
 
 				// Push result onto stack
@@ -101,5 +111,21 @@ public class ExpressionParser {
 		}
 
 		return Double.valueOf(stack.pop());
+	}
+
+	public static Double getDouble(String token, double x, double y) {
+		if (token.equals("x")) {
+			return x;
+		} else if (token.equals("y")) {
+			return y;
+		} else {
+			try {
+				return Double.valueOf(token);
+			} catch (NumberFormatException e) {
+				String errorMsg = String.format("Not a valid number: \"%s\"", token);
+				LOG.error(errorMsg);
+				throw new NumberFormatException(errorMsg);
+			}
+		}
 	}
 }

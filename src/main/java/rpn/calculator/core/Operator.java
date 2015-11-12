@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Operator {
-	ADDITION(Token.ADDITION, 0, Operator.LEFT_ASSOC, new Evaluator() {
+	ADDITION(Token.PLUS, 0, Operator.LEFT_ASSOC, new Evaluator() {
 		public double evaluate(double a, double b) {
 			return a + b;
 		}
@@ -15,7 +15,7 @@ public enum Operator {
 			return a + b;
 		}
 	}),
-	SUBTRACTION(Token.SUBTRACTION, 0, Operator.LEFT_ASSOC, new Evaluator() {
+	SUBTRACTION(Token.DASH, 0, Operator.LEFT_ASSOC, new Evaluator() {
 		public double evaluate(double a, double b) {
 			return a - b;
 		}
@@ -26,7 +26,7 @@ public enum Operator {
 			return a - b;
 		}
 	}),
-	MULTIPLICATION(Token.MULTIPLICATION, 5, Operator.LEFT_ASSOC, new Evaluator() {
+	MULTIPLICATION(Token.ASTERISK, 5, Operator.LEFT_ASSOC, new Evaluator() {
 		public double evaluate(double a, double b) {
 			return a * b;
 		}
@@ -37,7 +37,7 @@ public enum Operator {
 			return a * b;
 		}
 	}),
-	DIVISION(Token.DIVISION, 5, Operator.LEFT_ASSOC, new Evaluator() {
+	DIVISION(Token.SLASH, 5, Operator.LEFT_ASSOC, new Evaluator() {
 		public double evaluate(double a, double b) {
 			return a / b;
 		}
